@@ -148,7 +148,7 @@ async function run() {
 
             // get all sellers
 
-            app.get("/sellers",async (req,res) => {
+            app.get("/buyers",async (req,res) => {
 
               const query = {role:"buyer"}
 
