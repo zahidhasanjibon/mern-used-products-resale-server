@@ -82,14 +82,36 @@ async function run() {
         // get all products
 
         app.get("/products",async (req,res) => {
-
             const query = {}
-
             const products = await productsCollection.find(query).toArray()
-
             res.send(products)
+        })
+
+
+        //  get especific category product
+
+        app.get("/products/:name",async (req,res) => {
+            const categoryName = req.params.name
+              const query  = {category:categoryName}
+              const result = await productsCollection.find(query).toArray()
+              res.send(result)
+        })
+
+
+        // check user role 
+
+        app.get("/user/checkrole/:email",async (req,res) => {
+
+            const email = req.params.email
+            const query = {userEmail:email}
+            const user = await usersCollection.findOne(query)
+
+            console.log(user);
+            res.send({isAdmin:'yes'})      
+
 
         })
+
 
 
 
