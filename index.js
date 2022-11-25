@@ -123,6 +123,41 @@ async function run() {
         })
 
 
+          // get all orders 
+
+          app.get("/orders",async (req,res) => {
+              const {email} = req.query
+            const query = {buyerEmail:email}
+            const result   = await bookingCollection.find(query).toArray()
+
+            res.send(result)
+
+          })
+
+
+            // get all sellers
+
+            app.get("/sellers",async (req,res) => {
+
+              const query = {role:"seller"}
+
+              const result = await usersCollection.find(query).toArray()
+              res.send(result)
+
+            })
+
+            // get all sellers
+
+            app.get("/sellers",async (req,res) => {
+
+              const query = {role:"buyer"}
+
+              const result = await usersCollection.find(query).toArray()
+              res.send(result)
+
+            })
+
+
 
 
 
