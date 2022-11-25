@@ -27,6 +27,7 @@ const PORT  = process.env.PORT || 5000
 async function run() {
     const usersCollection = client.db("ph-assign-12").collection("users");
     const productsCollection = client.db("ph-assign-12").collection("products");
+    const bookingCollection = client.db("ph-assign-12").collection("booking");
 
   
     try {
@@ -105,10 +106,19 @@ async function run() {
             const email = req.params.email
             const query = {userEmail:email}
             const user = await usersCollection.findOne(query)
+            res.send({role:user?.role})      
+        })
 
-            console.log(user);
-            res.send({isAdmin:'yes'})      
 
+        // booking producct route
+
+        app.post("/booking",async (req,res) => {
+
+        const bookingData = req.body
+
+          const result = await bookingCollection.insertOne(bookingData)
+
+          res.send(result)
 
         })
 
