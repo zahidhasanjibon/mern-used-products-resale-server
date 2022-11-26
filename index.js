@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 
 const app = express();
-
 app.use(cors());
 dotenv.config();
 app.use(express.json());
@@ -58,7 +57,6 @@ async function run() {
       if (alreadySave.length) {
         return res.send({ message: "user already exist" });
       }
-
       const result = await usersCollection.insertOne(user);
       res.send(result);
     });
@@ -149,10 +147,53 @@ async function run() {
       res.send(result);
     });
 
+    // delete user -- admin
+
+    app.delete("/user/delete/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+
+      const result = await usersCollection.deleteOne(query);
+
+      res.send(result);
+    });
+
+    // delete product -- admin
+
+    app.delete("/delete/product/:id",async (req,res) => {
+
+      const id = req.params.id
+
+      const query = {_id:ObjectId(id)}
+      const result = await productsCollection.deleteOne(query)
+
+      res.send(result)
+
+
+    })
 
 
 
+    // report product to admin
 
+    app.put("/product/report/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const filter = { _id: ObjectId(id) };
+      const update = { $set: { report: true } };
+      const option = { upsert: true };
+      const result = await productsCollection.updateOne(filter, update, option);
+
+      res.send(result);
+    });
+
+    // get all reported items
+
+    app.get("/reported/products", async (req, res) => {
+      const query = { report: true };
+      const result = await productsCollection.find(query).toArray();
+      res.send(result);
+    });
 
     // check user role
 
