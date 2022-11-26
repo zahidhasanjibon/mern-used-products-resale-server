@@ -12,7 +12,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 5000;
 
 // mongodb connection
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.nxpijbg.mongodb.net/?retryWrites=true&w=majority`;
 client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -73,9 +73,9 @@ async function run() {
 
     app.post("/product", async (req, res) => {
       const product = req.body;
-      let timeWhenPost = new Date()
-      timeWhenPost = timeWhenPost.toString().slice(0,15)
-      product.timeWhenPost = timeWhenPost
+      let timeWhenPost = new Date();
+      timeWhenPost = timeWhenPost.toString().slice(0, 15);
+      product.timeWhenPost = timeWhenPost;
       const result = await productsCollection.insertOne(product);
       res.send(result);
     });
@@ -88,7 +88,6 @@ async function run() {
       res.send(products);
     });
 
-
     //  get especific category product
 
     app.get("/products/:name", async (req, res) => {
@@ -100,17 +99,59 @@ async function run() {
 
     // get seller all products
 
-    app.get("/sellerproducts",async (req,res) => {
+    app.get("/sellerproducts", async (req, res) => {
+      const sellerEmail = req.query.email;
 
-      const sellerEmail = req.query.email
+      const query = { sellerEmail: sellerEmail };
 
-      const query = {sellerEmail:sellerEmail}
+      const result = await productsCollection.find(query).toArray();
 
-      const result = await productsCollection.find(query).toArray()
-      
-      res.send(result)
+      res.send(result);
+    });
 
-    })
+    // get advertise products
+
+    app.get("/advertise/products", async (req, res) => {
+      const query = { advertise: true };
+      const result = await productsCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    // update product advertise status
+
+    app.put("/advertise/product/update/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const filter = { _id: ObjectId(id) };
+      const update = {
+        $set: {
+          advertise: true,
+        },
+      };
+      const option = { upsert: true };
+
+      const result = await productsCollection.updateOne(filter, update, option);
+      res.send(result);
+    });
+    // update seller verify status
+
+    app.put("/user/seller/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const update = {
+        $set: {
+          verify: true,
+        },
+      };
+      const option = { upsert: true };
+
+      const result = await usersCollection.updateOne(filter, update, option);
+      res.send(result);
+    });
+
+
+
+
 
 
     // check user role
@@ -170,12 +211,7 @@ async function run() {
       res.send(result);
     });
 
-
-        // create product route
-
-
-
-
+    // create product route
   } finally {
   }
 }
