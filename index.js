@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 5000;
 
 // mongodb connection
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { query } = require("express");
 const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.nxpijbg.mongodb.net/?retryWrites=true&w=majority`;
 client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -133,17 +134,29 @@ async function run() {
     });
     // update seller verify status
 
-    app.put("/user/seller/update/:id", async (req, res) => {
-      const id = req.params.id;
-      const filter = { _id: ObjectId(id) };
+    app.put("/user/seller/update/:email", async (req, res) => {
+      const email = req.params.email;
+      const filter = { userEmail: email };
       const update = {
         $set: {
           verify: true,
         },
       };
       const option = { upsert: true };
-
       const result = await usersCollection.updateOne(filter, update, option);
+
+          // to update product seller verify status
+
+        const query = {sellerEmail:email}
+        const updateData = {
+          $set :{
+            sellerVerified:true
+          }
+        }
+        const option2 = {
+          upsert:true
+        } 
+        const result2 = await productsCollection.updateMany(query,updateData,option2)
       res.send(result);
     });
 
@@ -252,6 +265,7 @@ async function run() {
       res.send(result);
     });
 
+   
     // create product route
   } finally {
   }
