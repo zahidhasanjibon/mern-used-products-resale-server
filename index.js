@@ -137,11 +137,11 @@ async function run() {
 
     // get all products
 
-    app.get("/products", async (req, res) => {
-      const query = {};
-      const products = await productsCollection.find(query).toArray();
-      res.send(products);
-    });
+    // app.get("/products", async (req, res) => {
+    //   const query = {};
+    //   const products = await productsCollection.find(query).toArray();
+    //   res.send(products);
+    // });
 
     //  get especific category product
 
@@ -166,8 +166,8 @@ async function run() {
 
     // get advertise products
 
-    app.get("/advertise/products",verifyJwtToken, async (req, res) => {
-      const query = { advertise: true };
+    app.get("/advertise/products", async (req, res) => {
+      const query = { advertise: true,status:"unsold" };
       const result = await productsCollection.find(query).toArray();
       res.send(result);
     });
@@ -190,7 +190,7 @@ async function run() {
     });
     // update seller verify status
 
-    app.put("/user/seller/update/:email", async (req, res) => {
+    app.put("/user/seller/update/:email",verifyJwtToken,verifyAdmin, async (req, res) => {
       const email = req.params.email;
       const filter = { userEmail: email };
       const update = {
@@ -276,11 +276,19 @@ async function run() {
     // booking producct route
 
     app.post("/booking", async (req, res) => {
+
       const bookingData = req.body;
+        const query = {productId:bookingData.productId}
+        
+        const findBooking = await bookingCollection.findOne(query)
+
+          if(findBooking) {
+            return res.send({message:"you have already booked this product",success:false})
+          }
 
       const result = await bookingCollection.insertOne(bookingData);
+     return res.send({message:"booking successfully",success:true});
 
-      res.send(result);
     });
 
 
@@ -350,9 +358,6 @@ async function run() {
         ]
       })
       res.send({clientSecret:paymentIntent.client_secret})
-
-
-
     })
     
 
