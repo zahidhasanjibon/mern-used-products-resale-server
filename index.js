@@ -26,7 +26,7 @@ client = new MongoClient(uri, {
 function verifyJwtToken(req, res, next) {
   try {
     const token = req.headers?.authorization?.split(" ")[1];
-    if (!token) {
+        if (!token) {
       return res.status(401).send({
         message: "unauthorize access",
       });
@@ -34,7 +34,7 @@ function verifyJwtToken(req, res, next) {
 
     jwt.verify(token, process.env.JSON_SECRET, (err, decode) => {
       if (err) {
-        return res.status(403).send({ message: "forbidden access" });
+        return res.status(403).send({ message: "forbidden accesss4" });
       }
       req.userEmail = decode.email;
       next();
@@ -65,7 +65,7 @@ async function run() {
       const userEmail = req.userEmail;
       const query = { userEmail };
       const user = await usersCollection.findOne(query);
-
+          console.log('in');
       if (user?.role !== "admin") {
         return res.status(401).send({ message: "fobidden acces" });
       }
@@ -74,11 +74,12 @@ async function run() {
 
     async function verifySeller(req, res, next) {
       const userEmail = req.userEmail;
+      console.log(userEmail);
       const query = { userEmail };
       const user = await usersCollection.findOne(query);
-
+        console.log(user);
       if (user?.role !== "seller") {
-        return res.status(401).send({ message: "fobidden acces" });
+        return res.status(401).send({ message: "fobidden acces3" });
       }
       next();
     }
