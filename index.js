@@ -98,6 +98,16 @@ async function run() {
 
     // save user info in database
 
+    app.get('/search/products',async (req,res) => {
+        const searchText = req.query.search
+
+      const query = { name: { $regex :searchText , $options:'i' } }
+        
+        const result = await productsCollection.find(query).toArray()
+      res.send(result)
+    })
+
+
     app.post("/register", async (req, res) => {
       const user = req.body;
       // check wether user already exist
@@ -292,7 +302,6 @@ async function run() {
 
     });
 
-
       // get booking product details for payment
 
         app.get("/booking/:id",async (req,res) => {
@@ -302,8 +311,6 @@ async function run() {
           const result = await bookingCollection.findOne(query)
           res.send(result)
         })
-
-
 
     // get all bookings
 
